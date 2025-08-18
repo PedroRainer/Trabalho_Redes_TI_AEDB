@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  front:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    container_name: front
+    restart: unless-stopped
+    expose:
+      - "3000" # usado só internamente
+    environment:
+      - NODE_ENV=production
+
+  views:
+    build:
+      context: ./views
+      dockerfile: Dockerfile
+    container_name: views
+    restart: unless-stopped
+    expose:
+      - "8080"
+
+  caddy:
+    # usando mirror do Google para evitar o problema do Docker Hub
+    image: mirror.gcr.io/library/caddy:2.8
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      # - "443:443"  # se quiser ativar TLS automático depois
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - front
+      - views
+
+volumes:
+  caddy_data:
+  caddy_config:

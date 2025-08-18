@@ -1,0 +1,17 @@
+:80 {
+    # Frontend Next.js (porta 3000 no container front)
+    handle_path /* {
+        reverse_proxy front:3000
+    }
+
+    # WebSocket do Go (porta 8080 no container views)
+    handle_path /ws* {
+        reverse_proxy views:8080
+    }
+
+    # Logs (opcional para debug)
+    log {
+        output stdout
+        format console
+    }
+}
