@@ -1,17 +1,26 @@
 :80 {
-    # Frontend Next.js (porta 3000 no container front)
+    encode gzip
+    log
+
+    # Roteia o site para o Next.js
     handle_path /* {
         reverse_proxy front:3000
     }
 
-    # WebSocket do Go (porta 8080 no container views)
+    # Roteia WebSockets para o backend Go
     handle_path /ws* {
-        reverse_proxy views:8080
+        reverse_proxy views:8080 {
+            transport http {
+                versions h2c 1.1
+            }
+        }
     }
 
-    # Logs (opcional para debug)
-    log {
-        output stdout
-        format console
+    # Segurança básica
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
     }
 }
