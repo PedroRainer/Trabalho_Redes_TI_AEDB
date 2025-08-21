@@ -1,16 +1,27 @@
 'use client';
 
+import React from 'react';
+import './terminal.css';
 
-import { useLogger } from '../hooks/useLogger';
-
-
-export default function Terminal() {
-const { logs } = useLogger();
-return (
-<div className="mt-6 p-4 bg-gray-900 border border-gray-700 rounded h-64 overflow-y-auto font-mono text-sm">
-{logs.map((log, i) => (
-<div key={i} className="text-green-400">{log}</div>
-))}
-</div>
-);
+interface TerminalProps {
+  logs: string[];
 }
+
+const Terminal: React.FC<TerminalProps> = ({ logs }) => {
+  return (
+    <div className="terminal">
+      <div className="terminal-header">
+        <span className="dot red" />
+        <span className="dot yellow" />
+        <span className="dot green" />
+      </div>
+      <div className="terminal-body">
+        {logs.map((log, index) => (
+          <pre key={index} className="terminal-line">{log}</pre>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default Terminal;

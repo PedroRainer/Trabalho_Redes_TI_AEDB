@@ -1,23 +1,54 @@
-# deps
+# ========================
+# 1. Stage: dependencies
+# ========================
 FROM mirror.gcr.io/library/node:22-alpine AS deps
 WORKDIR /app
+
+# Copia arquivos de dependência
 COPY package.json package-lock.json* ./
+
+# Instala as dependências com versionamento travado
 RUN npm ci
 
-# build
+# ========================
+# 2. Stage: build
+# ========================
 FROM mirror.gcr.io/library/node:22-alpine AS build
 WORKDIR /app
+
+# Copia os node_modules do estágio anterior
 COPY --from=deps /app/node_modules ./node_modules
+
+# Copia todo o código-fonte
 COPY . .
+
+# Desativa a telemetria do Next.js
 ENV NEXT_TELEMETRY_DISABLED=1
+
+# Faz o build de produção
 RUN npm run build
 
-# run
+# ========================
+# 3. Stage: run (produção)
+# ========================
 FROM mirror.gcr.io/library/node:22-alpine AS run
 WORKDIR /app
 ENV NODE_ENV=production
+
+# Copia o build final
 COPY --from=build /app/.next ./.next
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./
+COPY --from=build /app/public ./public
+COPY --from=build /app/next.config.mjs ./
+
+# Copia o restante do código usado em runtime (ex: app/, src/, hooks/, etc)
+COPY --from=build /app/src ./src
+
+
+
+# Porta que o Next.js escuta
 EXPOSE 3000
+
+# Comando de start
 CMD ["npm", "start"]

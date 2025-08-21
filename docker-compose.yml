@@ -1,24 +1,26 @@
 services:
   front:
     build:
-      context: ./front
-      dockerfile: Dockerfile
+      context: ./cmd/frontend
+      dockerfile: DockerFile
     container_name: front
     restart: unless-stopped
     expose:
-      - "3000"       # usado internamente; servido pelo Caddy
+      - "3000"  # Porta usada internamente pelo Caddy
     environment:
       - NODE_ENV=production
 
+  
   views:
     build:
-      context: ./views
+      context: ./cmd/views
       dockerfile: Dockerfile
     container_name: views
     restart: unless-stopped
     expose:
-      - "8080"       # porta TCP interna
-    # opcional (para testar pelo host com nc/cliente C):
+      - "8080"  # Porta usada internamente entre containers
+
+    # ✅ Mapeamento da porta para acesso externo ao backend
     ports:
       - "8080:8080"
 
@@ -27,10 +29,10 @@ services:
     container_name: caddy
     restart: unless-stopped
     ports:
-      - "80:80"
-      # - "443:443" # se ativar TLS depois
+      - "80:80"  # Acesso HTTP externo
+      # - "443:443" # (Descomente se for usar HTTPS/TLS)
     volumes:
-      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro  # Caddyfile de configuração
       - caddy_data:/data
       - caddy_config:/config
     depends_on:

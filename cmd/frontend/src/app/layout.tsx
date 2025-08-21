@@ -1,4 +1,4 @@
-import './globals.css';
+import './global.css';
 import { LoggerProvider } from '../hooks/useLogger';
 
 
