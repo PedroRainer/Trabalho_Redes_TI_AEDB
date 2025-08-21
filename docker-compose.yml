@@ -1,0 +1,41 @@
+services:
+  front:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    container_name: front
+    restart: unless-stopped
+    expose:
+      - "3000"     # usado internamente; exposto ao Caddy
+    environment:
+      - NODE_ENV=production
+
+  views:
+    build:
+      context: ./views
+      dockerfile: Dockerfile
+    container_name: views
+    restart: unless-stopped
+    expose:
+      - "1234"     # porta TCP interna
+    ports:
+      - "1234:1234"  # opcional: para testar via host (nc/cliente C)
+
+  caddy:
+    image: mirror.gcr.io/library/caddy:2.8
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      # - "443:443" # se for ativar TLS com domínio
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - front
+      - views
+
+volumes:
+  caddy_data:
+  caddy_config:
