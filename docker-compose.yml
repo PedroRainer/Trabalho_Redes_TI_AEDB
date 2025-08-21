@@ -6,7 +6,7 @@ services:
     container_name: front
     restart: unless-stopped
     expose:
-      - "3000"     # usado internamente; exposto ao Caddy
+      - "3000"       # usado internamente; servido pelo Caddy
     environment:
       - NODE_ENV=production
 
@@ -17,9 +17,10 @@ services:
     container_name: views
     restart: unless-stopped
     expose:
-      - "1234"     # porta TCP interna
+      - "8080"       # porta TCP interna
+    # opcional (para testar pelo host com nc/cliente C):
     ports:
-      - "1234:1234"  # opcional: para testar via host (nc/cliente C)
+      - "8080:8080"
 
   caddy:
     image: mirror.gcr.io/library/caddy:2.8
@@ -27,7 +28,7 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
-      # - "443:443" # se for ativar TLS com domínio
+      # - "443:443" # se ativar TLS depois
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data

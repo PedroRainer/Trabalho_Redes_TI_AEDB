@@ -2,12 +2,12 @@
     encode gzip
     log
 
-    # site Next.js
+    # Site Next.js
     handle_path /* {
         reverse_proxy front:3000
     }
 
-    # Sem /ws agora: tráfego entre front e views é TCP interno, via /api/tcp no Next
+    # (Sem /ws: o front fala com o Go via /api/tcp abrindo socket TCP interno)
     header {
         X-Content-Type-Options "nosniff"
         X-Frame-Options "DENY"
