@@ -1,0 +1,15 @@
+:80 {
+    encode gzip
+    log
+
+    # Site Next.js
+    reverse_proxy front:3000
+
+
+    # (Sem /ws: o front fala com o Go via /api/tcp abrindo socket TCP interno)
+    header {
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+}

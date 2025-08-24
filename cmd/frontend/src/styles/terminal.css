@@ -1,0 +1,44 @@
+.terminal {
+  background-color: #1e1e1e;
+  color: #00ff90;
+  font-family: 'Fira Code', monospace;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 0 10px #000;
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #333;
+}
+
+.terminal-header {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 1rem;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.red {
+  background-color: #ff5f56;
+}
+
+.yellow {
+  background-color: #ffbd2e;
+}
+
+.green {
+  background-color: #27c93f;
+}
+
+.terminal-body {
+  white-space: pre-wrap;
+}
+
+.terminal-line {
+  line-height: 1.4;
+}
