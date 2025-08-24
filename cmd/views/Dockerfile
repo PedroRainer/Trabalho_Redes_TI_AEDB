@@ -14,6 +14,6 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /out/app ./main
 FROM gcr.io/distroless/static:nonroot
 WORKDIR /app
 COPY --from=build /out/app /app/app
-EXPOSE 8080
+EXPOSE 1234
 USER nonroot:nonroot
 ENTRYPOINT ["/app/app"]

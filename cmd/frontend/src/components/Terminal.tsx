@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import './terminal.css';
+
 
 interface TerminalProps {
   logs: string[];

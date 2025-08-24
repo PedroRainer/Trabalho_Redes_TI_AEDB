@@ -3,9 +3,8 @@
     log
 
     # Site Next.js
-    handle_path /* {
-        reverse_proxy front:3000
-    }
+    reverse_proxy front:3000
+
 
     # (Sem /ws: o front fala com o Go via /api/tcp abrindo socket TCP interno)
     header {

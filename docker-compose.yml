@@ -18,11 +18,11 @@ services:
     container_name: views
     restart: unless-stopped
     expose:
-      - "8080"  # Porta usada internamente entre containers
+      - "1234"  # Porta usada internamente entre containers
 
     # ✅ Mapeamento da porta para acesso externo ao backend
     ports:
-      - "8080:8080"
+      - "1234:1234"
 
   caddy:
     image: mirror.gcr.io/library/caddy:2.8
