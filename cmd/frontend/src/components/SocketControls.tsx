@@ -1,91 +1,70 @@
 // cmd/frontend/src/components/SocketControls.tsx
 'use client';
 
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useLogger } from '../hooks/useLogger';
 
 export default function SocketControls() {
   const { addLog } = useLogger();
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
-  const wsRef = useRef<WebSocket | null>(null);
 
   const sendOnce = async () => {
     const text = message.trim();
     if (!text) return;
 
-    // impede abrir outra conexão enquanto há uma em aberto
-    if (wsRef.current && wsRef.current.readyState !== WebSocket.CLOSED) {
-      addLog('⚠️ Já existe uma conexão aberta. Feche antes de enviar novamente.');
-      return;
-    }
-
     setSending(true);
     try {
-      // inicializa o bridge no Next (instala o listener de upgrade)
+      // 1) inicializa o bridge no Next (instala o listener de upgrade)
       await fetch('/api/tcp', { method: 'GET' }).catch(() => {});
 
+      // 2) abre WS para o mesmo host/porta da página
       const proto = location.protocol === 'https:' ? 'wss' : 'ws';
       const url = `${proto}://${location.host}/api/tcp`;
       const ws = new WebSocket(url);
-      wsRef.current = ws;
 
       let closed = false;
       const safeClose = (code = 1000, reason = 'one-shot') => {
         if (closed) return;
         closed = true;
         try { ws.close(code, reason); } catch {}
-        wsRef.current = null;
         setSending(false);
       };
 
+      // timeout de segurança (fecha se nada voltar)
+      const guard = setTimeout(() => {
+        addLog('⏱️ Sem resposta do servidor (timeout curto)');
+        safeClose(1000, 'timeout');
+      }, 1500);
+
       ws.onopen = () => {
-        // envia com newline (Scanner do Go lê por linha)
+        // 3) envia com newline (scanner do Go lê linha por linha)
         ws.send(text.endsWith('\n') ? text : text + '\n');
         addLog('📤 ' + text);
-        setMessage('');
       };
 
       ws.onmessage = (e) => {
+        clearTimeout(guard);
         addLog('📩 ' + e.data);
-        // fecha automaticamente após a primeira resposta
+        // 4) fecha após a primeira resposta
         safeClose(1000, 'done');
       };
 
       ws.onerror = () => {
+        clearTimeout(guard);
         addLog('❌ Erro na conexão WebSocket');
         safeClose(1011, 'ws-error');
       };
 
       ws.onclose = () => {
-        if (!closed) {
-          // fechado pelo servidor/usuário sem passar pelo safeClose
-          wsRef.current = null;
-          setSending(false);
-        }
-        addLog('🔒 Conexão fechada');
+        clearTimeout(guard);
+        if (!closed) setSending(false);
       };
     } catch (err: any) {
       setSending(false);
       addLog('⚠️ Falha no envio: ' + (err?.message ?? String(err)));
-    }
-  };
-
-  const handleManualClose = () => {
-    const ws = wsRef.current;
-    if (!ws) {
-      addLog('ℹ️ Não há conexão para fechar');
-      return;
-    }
-    if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
-      try {
-        ws.close(1000, 'manual-close');
-        addLog('⏹️ Fechando conexão por comando do usuário…');
-      } catch (err: any) {
-        addLog('⚠️ Falha ao fechar: ' + (err?.message ?? String(err)));
-      }
-    } else {
-      addLog('ℹ️ Socket não está aberto');
+    } finally {
+      setMessage('');
     }
   };
 
@@ -116,15 +95,9 @@ export default function SocketControls() {
         >
           {sending ? 'Enviando…' : 'Enviar (one-shot)'}
         </button>
-        <button
-          onClick={handleManualClose}
-          disabled={!wsRef.current || wsRef.current.readyState === WebSocket.CLOSED}
-          className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 disabled:opacity-50"
-        >
-          Close connection
-        </button>
       </div>
 
+      {/* opcional: um botão de teste rápido sem digitar */}
       <div>
         <button
           onClick={() => { setMessage('ping'); }}
