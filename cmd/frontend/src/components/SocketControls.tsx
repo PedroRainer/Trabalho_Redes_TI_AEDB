@@ -1,4 +1,4 @@
-// cmd/frontend/src/components/SocketControls.tsx
+
 'use client';
 
 import { useRef, useState } from 'react';
@@ -27,6 +27,10 @@ export default function SocketControls() {
 
       const proto = location.protocol === 'https:' ? 'wss' : 'ws';
       const url = `${proto}://${location.host}/api/tcp`;
+
+      // 👉 loga que vai conectar
+      addLog(`🔌 Conectando WebSocket… (${url})`);
+
       const ws = new WebSocket(url);
       wsRef.current = ws;
 
@@ -40,6 +44,9 @@ export default function SocketControls() {
       };
 
       ws.onopen = () => {
+        // 👉 loga que conectou
+        addLog('✅ Conexão iniciada');
+
         // envia com newline (Scanner do Go lê por linha)
         ws.send(text.endsWith('\n') ? text : text + '\n');
         addLog('📤 ' + text);
@@ -52,7 +59,7 @@ export default function SocketControls() {
         safeClose(1000, 'done');
       };
 
-      ws.onerror = () => {
+      ws.onerror = (ev) => {
         addLog('❌ Erro na conexão WebSocket');
         safeClose(1011, 'ws-error');
       };
