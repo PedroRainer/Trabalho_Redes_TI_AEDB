@@ -1,6 +1,6 @@
 import type { AppProps } from 'next/app';
 import '../src/styles/terminal.css'; 
-import '../src/styles/flamengo.css';
+import '../src/styles/global.css';
 
 
 import { LoggerProvider } from '../src/hooks/useLogger';
