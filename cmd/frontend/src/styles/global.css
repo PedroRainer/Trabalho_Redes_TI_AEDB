@@ -1,0 +1,62 @@
+
+
+* { box-sizing: border-box; }
+html, body, #__next { height: 100%; }
+body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+
+body {
+  /* Gradient from red to black over the page background image */
+  color: #ffffff;
+  margin: 0;
+  padding: 24px;
+
+  /* Layered background: gradient on top of image */
+  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.952), rgba(233, 9, 9, 0.9)),
+                    url("/Arrascaeta-Flamengo-aspect-ratio-512-320.webp");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  background-attachment: fixed;
+  background-blend-mode: overlay;
+  min-height: 100vh;
+}
+
+.container {
+  /* Keep content centered and constrained */
+  width: auto;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+h1 {
+  color: #c2401f;
+  text-shadow: 0 0 4px #ff3300;
+}
+
+button {
+  background-color: #111;
+  color: #ff3300;
+  border: 1px solid #ff3300;
+  padding: 10px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  background-color: #00ffff;
+  color: #000;
+}
+
+input {
+  background-color: #1a1a1a;
+  color: white;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+form,
+div {
+  margin-top: 12px;
+}
