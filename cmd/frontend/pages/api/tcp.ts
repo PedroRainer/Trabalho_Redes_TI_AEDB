@@ -34,7 +34,7 @@ function initWSS(srv: WithWSS) {
         tcp.setKeepAlive(true, 15_000);
 
         // Envia linha inicial para servidores que encerram por inatividade
-        try { tcp.write('HELLO\n'); } catch {}
+        try { tcp.write('\n'); } catch {}
       });
 
       // Encaminha WebSocket -> TCP (garantindo newline)
