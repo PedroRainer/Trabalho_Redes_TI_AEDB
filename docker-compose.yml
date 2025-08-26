@@ -1,44 +1,43 @@
 services:
-  front:
-    build:
-      context: ./cmd/frontend
-      dockerfile: DockerFile
-    container_name: front
-    restart: unless-stopped
-    expose:
-      - "3000"  # Porta usada internamente pelo Caddy
-    environment:
-      - NODE_ENV=production
-
-  
   views:
     build:
       context: ./cmd/views
       dockerfile: Dockerfile
     container_name: views
-    restart: unless-stopped
+    environment:
+      - TZ=America/Sao_Paulo
     expose:
-      - "1234"  # Porta usada internamente entre containers
+      - "1234"
+    restart: unless-stopped
 
-    # ✅ Mapeamento da porta para acesso externo ao backend
-    ports:
-      - "1234:1234"
+  front:
+    build:
+      context: ./cmd/frontend
+      dockerfile: Dockerfile
+    container_name: front
+    environment:
+      - TZ=America_Sao_Paulo
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+      - TCP_HOST=views
+      - TCP_PORT=1234
+      - PORT=3000
+    depends_on:
+      - views
+    expose:
+      - "3000"
+    restart: unless-stopped
 
   caddy:
-    image: mirror.gcr.io/library/caddy:2.8
+    image: caddy:2.8
     container_name: caddy
-    restart: unless-stopped
     ports:
-      - "80:80"  # Acesso HTTP externo
-      # - "443:443" # (Descomente se for usar HTTPS/TLS)
+      - "80:80"
+      - "443:443"
     volumes:
-      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro  # Caddyfile de configuração
-      - caddy_data:/data
-      - caddy_config:/config
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
     depends_on:
       - front
-      - views
-
-volumes:
-  caddy_data:
-  caddy_config:
+    environment:
+      - TZ=America/Sao_Paulo
+    restart: unless-stopped

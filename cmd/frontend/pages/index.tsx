@@ -6,10 +6,31 @@ export default function Home() {
   const { logs } = useLogger();
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h1 style={{ fontWeight: 'bold', fontSize: '1.5rem' }}>Socket Test UI</h1>
-      <SocketControls />
-      <Terminal logs={logs} />
-    </div>
+    <main className="mengao mengao-bg">
+      <div className="mengao-container">
+        <header className="mengao-card">
+          <h1 className="mengao-title">
+            <span className="bar" /> Socket Test UI — Flamengo Version
+          </h1>
+          <p style={{opacity:.9, marginTop:'.25rem'}}>
+            Cliente WebSocket ⇄ Bridge (upgrade) ⇄ Servidor TCP
+          </p>
+        </header>
+
+        <section className="mengao-card" style={{marginTop:'1rem'}}>
+          <div className="row">
+            
+            <SocketControls />
+          </div>
+        </section>
+
+        <section className="mengao-card" style={{marginTop:'1rem'}}>
+         
+          <div className="terminal">
+            <Terminal logs={logs} />
+          </div>
+        </section>
+      </div>
+    </main>
   );
 }

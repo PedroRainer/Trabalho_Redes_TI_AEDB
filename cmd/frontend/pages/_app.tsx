@@ -1,5 +1,7 @@
 import type { AppProps } from 'next/app';
-import '../src/styles/terminal.css'; // caminho certo pela sua árvore
+import '../src/styles/terminal.css'; 
+import '../src/styles/flamengo.css';
+
 
 import { LoggerProvider } from '../src/hooks/useLogger';
 

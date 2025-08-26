@@ -1,19 +1,14 @@
-# build
-FROM mirror.gcr.io/library/golang:1.22 AS build
+# syntax=docker/dockerfile:1
+FROM golang:1.22-alpine AS build
 WORKDIR /src
+RUN apk add --no-cache ca-certificates
+COPY . .
+RUN go build -o /out/views ./main
 
-COPY go.mod ./
-RUN go mod tidy
-
-COPY command ./command
-COPY main ./main
-
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /out/app ./main
-
-# run
-FROM gcr.io/distroless/static:nonroot
+FROM alpine:3.20
 WORKDIR /app
-COPY --from=build /out/app /app/app
+RUN apk add --no-cache ca-certificates tzdata
+ENV TZ=America/Sao_Paulo
+COPY --from=build /out/views /usr/local/bin/views
 EXPOSE 1234
-USER nonroot:nonroot
-ENTRYPOINT ["/app/app"]
+CMD ["views"]
