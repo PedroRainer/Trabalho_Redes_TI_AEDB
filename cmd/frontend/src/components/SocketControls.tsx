@@ -10,32 +10,25 @@ export default function SocketControls() {
   const [sending, setSending] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
 
-  // Garante que o listener de upgrade (/api/tcp) seja inicializado no Next
-  const ensureBridge = async () => {
-    try {
-      await fetch('/api/tcp', { method: 'GET', cache: 'no-store' });
-      await new Promise((r) => setTimeout(r, 10));
-    } catch {
-      addLog('⚠️ Falha ao inicializar bridge (/api/tcp)');
-    }
-  };
-
-  const sendOnce = async (overrideText?: string) => {
-    const text = (overrideText ?? message).trim();
+  const sendOnce = async () => {
+    const text = message.trim();
     if (!text) return;
 
-    // Evita abrir outra conexão enquanto a atual ainda não foi fechada
+    // impede abrir outra conexão enquanto há uma em aberto
     if (wsRef.current && wsRef.current.readyState !== WebSocket.CLOSED) {
-      addLog('⚠️ Aguarde a conexão atual fechar antes de enviar novamente.');
+      addLog('⚠️ Já existe uma conexão aberta. Feche antes de enviar novamente.');
       return;
     }
 
     setSending(true);
     try {
-      await ensureBridge();
+      // inicializa o bridge no Next (instala o listener de upgrade)
+      await fetch('/api/tcp', { method: 'GET' }).catch(() => {});
 
       const proto = location.protocol === 'https:' ? 'wss' : 'ws';
       const url = `${proto}://${location.host}/api/tcp`;
+
+      // 👉 loga que vai conectar
       addLog(`🔌 Conectando WebSocket… (${url})`);
 
       const ws = new WebSocket(url);
@@ -51,29 +44,33 @@ export default function SocketControls() {
       };
 
       ws.onopen = () => {
+        // 👉 loga que conectou
         addLog('✅ Conexão iniciada');
+
+        // envia com newline (Scanner do Go lê por linha)
         ws.send(text.endsWith('\n') ? text : text + '\n');
         addLog('📤 ' + text);
-        if (!overrideText) setMessage('');
+        setMessage('');
       };
 
       ws.onmessage = (e) => {
         addLog('📩 ' + e.data);
-        // Fecha automaticamente após a primeira resposta
+        // fecha automaticamente após a primeira resposta
         safeClose(1000, 'done');
       };
 
-      ws.onerror = () => {
+      ws.onerror = (ev) => {
         addLog('❌ Erro na conexão WebSocket');
         safeClose(1011, 'ws-error');
       };
 
-      ws.onclose = (ev) => {
+      ws.onclose = () => {
         if (!closed) {
+          // fechado pelo servidor/usuário sem passar pelo safeClose
           wsRef.current = null;
           setSending(false);
         }
-        addLog(`🔒 Conexão fechada (code=${ev.code}${ev.reason ? `, reason=${ev.reason}` : ''})`);
+        addLog('🔒 Conexão fechada');
       };
     } catch (err: any) {
       setSending(false);
@@ -81,8 +78,26 @@ export default function SocketControls() {
     }
   };
 
+  const handleManualClose = () => {
+    const ws = wsRef.current;
+    if (!ws) {
+      addLog('ℹ️ Não há conexão para fechar');
+      return;
+    }
+    if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+      try {
+        ws.close(1000, 'manual-close');
+        addLog('⏹️ Fechando conexão por comando do usuário…');
+      } catch (err: any) {
+        addLog('⚠️ Falha ao fechar: ' + (err?.message ?? String(err)));
+      }
+    } else {
+      addLog('ℹ️ Socket não está aberto');
+    }
+  };
+
   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // Enter envia; Shift+Enter insere nova linha
+    // Enter envia; Shift+Enter quebra linha
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       if (!sending) sendOnce();
@@ -102,19 +117,28 @@ export default function SocketControls() {
           disabled={sending}
         />
         <button
-          onClick={() => sendOnce()}
+          onClick={sendOnce}
           disabled={sending || !message.trim()}
           className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50"
         >
-          {sending ? 'Enviando…' : 'Enviar'}
+          {sending ? 'Enviando…' : 'Enviar (one-shot)'}
         </button>
         <button
-          onClick={() => sendOnce('ping')}
-          disabled={sending}
-          className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 disabled:opacity-50"
-          title='Envia "ping" em one-shot'
+          onClick={handleManualClose}
+          disabled={!wsRef.current || wsRef.current.readyState === WebSocket.CLOSED}
+          className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 disabled:opacity-50"
         >
-          Enviar ping
+          Close connection
+        </button>
+      </div>
+
+      <div>
+        <button
+          onClick={() => { setMessage('ping'); }}
+          disabled={sending}
+          className="text-sm underline"
+        >
+          Preencher com "ping"
         </button>
       </div>
     </div>
