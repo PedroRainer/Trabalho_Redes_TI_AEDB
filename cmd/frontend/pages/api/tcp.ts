@@ -15,7 +15,7 @@ const TCP_PORT = Number(process.env.TCP_PORT ?? 1234);
 type WithWSS = Server & { wss?: WebSocketServer; __wss_inited?: boolean };
 
 function initWSS(srv: WithWSS) {
-  if (srv.__wss_inited) return; // Evita reinstalação em ambiente HMR
+  if (srv.__wss_inited) return;
 
   const wss = new WebSocketServer({ noServer: true });
 
@@ -26,25 +26,23 @@ function initWSS(srv: WithWSS) {
     wss.handleUpgrade(req, socket, head, (ws) => {
       console.log('[WS] upgrade -> /api/tcp');
 
-      // Abre TCP quando o WebSocket é estabelecido
       const tcp = net.createConnection({ host: TCP_HOST, port: TCP_PORT }, () => {
         console.log(`[WS] TCP conectado ${TCP_HOST}:${TCP_PORT}`);
-        try { ws.send(`[INFO] Bridge conectado ao TCP ${TCP_HOST}:${TCP_PORT}`); } catch {}
         tcp.setNoDelay(true);
         tcp.setKeepAlive(true, 15_000);
 
-        
-        
+        // Envia linha inicial para servidores que encerram por inatividade
+        try { tcp.write('\n'); } catch {}
       });
 
-      // Encaminha WebSocket -> TCP (garantindo newline)
+      // WS → TCP (sempre com newline)
       ws.on('message', (raw: any) => {
         const s = Buffer.isBuffer(raw) ? raw.toString() : String(raw);
         const out = s.endsWith('\n') ? s : s + '\n';
         try { tcp.write(out); } catch {}
       });
 
-      // Encaminha TCP -> WebSocket
+      // TCP → WS
       tcp.on('data', (data) => {
         if (ws.readyState === ws.OPEN) {
           try { ws.send(data.toString()); } catch {}
@@ -87,6 +85,5 @@ function initWSS(srv: WithWSS) {
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const srv = res.socket.server as WithWSS;
   initWSS(srv);
-  // Chamada HTTP atua como gatilho para garantir que o upgrade esteja instalado
   res.status(200).end('WS bridge ready');
 }
