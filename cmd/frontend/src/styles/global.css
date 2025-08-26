@@ -11,7 +11,7 @@ body {
   padding: 24px;
 
   /* Layered background: gradient on top of image */
-  background-image: linear-gradient(to bottom, rgba(24, 134, 223, 0.952), rgba(0,0,0,0.9)),
+  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.952), rgba(233, 9, 9, 0.9)),
                     url("/Arrascaeta-Flamengo-aspect-ratio-512-320.webp");
   background-repeat: no-repeat;
   background-position: center center;
@@ -29,14 +29,14 @@ body {
   margin-right: auto;
 }
 h1 {
-  color: #00ffff;
-  text-shadow: 0 0 4px #00ffff;
+  color: #c2401f;
+  text-shadow: 0 0 4px #ff3300;
 }
 
 button {
   background-color: #111;
-  color: #00ffff;
-  border: 1px solid #00ffff;
+  color: #ff3300;
+  border: 1px solid #ff3300;
   padding: 10px 14px;
   border-radius: 6px;
   cursor: pointer;
