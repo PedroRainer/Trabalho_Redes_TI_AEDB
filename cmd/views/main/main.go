@@ -2,7 +2,9 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"strings"
@@ -24,7 +26,11 @@ func handleConnection(conn net.Conn) {
 	for {
 		line, err := reader.ReadString('\n')
 		if err != nil {
-			log.Printf("read err de %s: %v", peer, err)
+			if errors.Is(err, io.EOF) {
+				log.Printf("cliente encerrou: %s", peer)
+			} else {
+				log.Printf("read err de %s: %v", peer, err)
+			}
 			return
 		}
 		msg := strings.TrimSpace(line)
