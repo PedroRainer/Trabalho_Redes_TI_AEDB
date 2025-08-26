@@ -1,3 +1,4 @@
+// cmd/views/main/main.go (ou equivalente)
 package main
 
 import (
@@ -17,9 +18,7 @@ func handleConnection(conn net.Conn) {
 	reader := bufio.NewReader(conn)
 	writer := bufio.NewWriter(conn)
 
-	// Envia banner opcional
-	fmt.Fprintf(writer, "WELCOME %s\n", time.Now().Format(time.RFC3339))
-	writer.Flush()
+	// ❌ Sem banner de boas-vindas. Não enviamos nada aqui.
 
 	for {
 		line, err := reader.ReadString('\n')
@@ -39,10 +38,10 @@ func handleConnection(conn net.Conn) {
 			fmt.Fprintf(writer, "TIME %s\n", time.Now().Format(time.RFC3339))
 		default:
 			if msg == "" {
-				// Linha em branco é ignorada
 				continue
 			}
-			fmt.Fprintf(writer, "ECHO %s\n", msg)
+			// ✅ eco puro: responde exatamente o que o cliente mandou
+			fmt.Fprintln(writer, msg)
 		}
 		writer.Flush()
 	}
