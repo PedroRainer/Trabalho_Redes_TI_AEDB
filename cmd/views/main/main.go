@@ -1,4 +1,3 @@
-// cmd/views/main/main.go (ou equivalente)
 package main
 
 import (
@@ -20,8 +19,6 @@ func handleConnection(conn net.Conn) {
 	reader := bufio.NewReader(conn)
 	writer := bufio.NewWriter(conn)
 
-	// ❌ Sem banner de boas-vindas. Não enviamos nada aqui.
-
 	for {
 		line, err := reader.ReadString('\n')
 		if err != nil {
@@ -33,6 +30,9 @@ func handleConnection(conn net.Conn) {
 			return
 		}
 		msg := strings.TrimSpace(line)
+		if msg == "" {
+			continue
+		}
 		log.Printf("rx de %s: %q", peer, msg)
 
 		switch strings.ToUpper(msg) {
@@ -43,11 +43,7 @@ func handleConnection(conn net.Conn) {
 		case "TIME", "TIME?":
 			fmt.Fprintf(writer, "TIME %s\n", time.Now().Format(time.RFC3339))
 		default:
-			if msg == "" {
-				continue
-			}
-			// ✅ eco puro: responde exatamente o que o cliente mandou
-			fmt.Fprintln(writer, msg)
+			fmt.Fprintln(writer, msg) // eco puro
 		}
 		writer.Flush()
 	}
