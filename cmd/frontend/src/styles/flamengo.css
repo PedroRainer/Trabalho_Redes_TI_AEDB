@@ -83,7 +83,8 @@ h1.mengao-title {
   display: flex; gap: .75rem; align-items: flex-start;
 }
 
-/* terminal/logs (seu componente pode não ter classe; isso cobre <pre> e <div> comuns) */
+.mengao .terminal, .mengao pre {
+  /* Styles for terminal/log output. This covers common <pre> and <div> cases when the component does not provide a class. */
 .mengao .terminal, .mengao pre {
   font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,'Liberation Mono','Courier New',monospace;
   background: rgba(0,0,0,.6);

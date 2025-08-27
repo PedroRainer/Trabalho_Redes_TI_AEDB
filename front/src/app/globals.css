@@ -1,0 +1,118 @@
+/* Defines the Flamengo theme — red-black.
+  Intended usage: include via <link rel="stylesheet" href="/css/flamengo-theme.css">.
+  Provides quick options:
+  - Applying <body class="fla-stripes"> enables a horizontal red-black striped background.
+  - Applying <body data-flat> enables a flat black background with red accents.
+*/
+
+:root {
+  /* Defines the red-black palette (consistent tones for UI). */
+  --fla-red: #C8102E;        /* Defines the primary red color. */
+  --fla-red-600: #a60d25;    /* Defines a darker/red hover shade. */
+  --fla-red-400: #e0243a;    /* Defines a lighter red used for glows. */
+  --fla-black: #0b0b0b;      /* Defines the dark base color. */
+  --fla-black-800: #121212;  /* Defines surface background shade. */
+  --fla-black-700: #1a1a1a;  /* Defines subtle border shade. */
+  --text-100: #fafafa;       /* Defines the primary text color. */
+  --text-300: #dcdcdc;       /* Defines the secondary text color. */
+  --gold: #d4af37;           /* Defines an optional gold accent color. */
+
+  --radius: 14px;
+  --shadow-red: 0 0 0.6rem rgba(200,16,46,.35), 0 0 1.2rem rgba(200,16,46,.2);
+  --ring-red: 0 0 0 2px rgba(200,16,46,.55), 0 0 0 6px rgba(200,16,46,.18);
+}
+
+html, body { height: 100%; }
+body {
+  margin: 0;
+  color: var(--text-100);
+  background: var(--fla-black);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+/* Provides a horizontal red-black striped background (classic style). */
+body.fla-stripes {
+  background:
+    repeating-linear-gradient(0deg,
+      var(--fla-black) 0 80px,
+      var(--fla-red) 80px 160px);
+}
+
+/* Provides an alternative subtle diagonal stripe overlay above the black background. */
+body[data-flat]::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none;
+  background:
+    repeating-linear-gradient(135deg,
+      rgba(200,16,46,.08) 0 16px,
+      transparent 16px 32px);
+}
+
+/* Sets the red-black text selection style. */
+::selection { background: rgba(200,16,46,.35); color: #fff; }
+
+/* Defines headings and typography styles. */
+h1, h2, h3 { color: var(--fla-red); text-shadow: 0 0 8px rgba(200,16,46,.25); letter-spacing: .02em; }
+p, li { color: var(--text-300); }
+
+/* Defines link appearance and hover effect. */
+a { color: var(--fla-red); text-decoration: none; border-bottom: 1px solid rgba(200,16,46,.45); }
+a:hover { text-shadow: 0 0 10px rgba(200,16,46,.35); border-bottom-color: var(--fla-red); }
+
+/* Defines base button styling. */
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:.55rem; padding:.7rem 1rem; border-radius: var(--radius); border:1px solid var(--fla-black-700); background: var(--fla-black-800); color: var(--text-100); transition: transform .08s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease; }
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn:focus-visible { outline: none; box-shadow: var(--ring-red); }
+
+/* Defines red-black button variations. */
+.btn.rubro { background: linear-gradient(180deg, var(--fla-red) 0%, var(--fla-red-600) 100%); border-color: rgba(0,0,0,.4); box-shadow: var(--shadow-red); }
+.btn.rubro:hover { filter: brightness(1.05); }
+
+.btn.negro { background: linear-gradient(180deg, var(--fla-black-800), var(--fla-black)); border-color: var(--fla-red); }
+.btn.negro:hover { box-shadow: 0 0 0.6rem rgba(255,255,255,.08); }
+
+/* Defines CTA band styling with a subtle red-black stripe. */
+.btn.faixa { position: relative; overflow: hidden; }
+.btn.faixa::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(200,16,46,.25) 0 6px, transparent 6px 12px); mix-blend-mode: screen; opacity:.4; }
+
+/* Defines a minimalist Flamengo-styled back button. */
+.back-button { border-radius: 999px; padding:.55rem .85rem; border:1px solid var(--fla-red); color: var(--text-100); background: var(--fla-black-800); box-shadow: var(--shadow-red); }
+.back-button .arrow { color: var(--fla-red); font-weight: 800; margin-right:.25rem; }
+
+/* Defines card and surface styles. */
+.card { background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)); border:1px solid var(--fla-black-700); border-radius: var(--radius); padding:1rem; box-shadow: 0 0 1.2rem rgba(0,0,0,.35); }
+.card.titulo { border-left: 6px solid var(--fla-red); }
+
+.hr { height:1px; border:none; background: linear-gradient(90deg, transparent, var(--fla-red), transparent); opacity:.65; }
+
+/* Defines form controls and focus states. */
+.input, input[type="text"], input[type="email"], input[type="password"], textarea, select {
+  background: var(--fla-black-800);
+  border: 1px solid var(--fla-black-700);
+  color: var(--text-100);
+  border-radius: 12px; padding:.65rem .8rem; transition: box-shadow .2s ease, border-color .2s ease, background .2s ease;
+}
+.input:focus, input:focus, textarea:focus, select:focus { outline:none; border-color: var(--fla-red); box-shadow: var(--ring-red); }
+
+/* Defines table appearance and hover states. */
+.table { width:100%; border-collapse: collapse; font-size:.95rem; }
+.table th, .table td { border:1px solid var(--fla-black-700); padding:.65rem .7rem; }
+.table thead th { background: rgba(200,16,46,.18); color:#fff; }
+.table tbody tr:hover { background: rgba(200,16,46,.08); }
+
+/* Defines badge styles and variations. */
+.badge { display:inline-flex; align-items:center; gap:.4rem; padding:.25rem .55rem; border-radius:999px; border:1px solid var(--fla-red); background: rgba(200,16,46,.15); color:#fff; box-shadow: var(--shadow-red); }
+.badge.gold { border-color: var(--gold); background: rgba(212,175,55,.12); color: #fff; }
+
+/* Utility classes and helpers. */
+.text-dim { color: var(--text-300); }
+.glow-red { text-shadow: 0 0 12px rgba(200,16,46,.6); }
+.ring-red { box-shadow: var(--ring-red); }
+
+/* Defines header with a red-black band accent. */
+.header-fla { position: relative; padding: 1.25rem 1rem; border-bottom: 1px solid var(--fla-black-700); background: var(--fla-black-800); }
+.header-fla::after { content:""; position:absolute; left:0; right:0; bottom:-1px; height:8px; background: repeating-linear-gradient(90deg, var(--fla-red) 0 40px, var(--fla-black) 40px 80px); opacity:.9; }
+
+/* Defines an optional footer style. */
+.footer-fla { padding: 1rem; border-top: 1px solid var(--fla-black-700); background: linear-gradient(180deg, var(--fla-black-800), var(--fla-black)); color: var(--text-300); }
+.footer-fla .estrela { color: var(--gold); margin: 0 .15rem; }

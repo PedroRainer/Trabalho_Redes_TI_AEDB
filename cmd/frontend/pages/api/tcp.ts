@@ -1,4 +1,4 @@
-// cmd/frontend/src/pages/api/tcp.ts
+// bridge handler for WebSocket-to-TCP proxy
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { Server } from 'http';
 import { WebSocketServer } from 'ws';
@@ -34,14 +34,14 @@ function initWSS(srv: WithWSS) {
        
       });
 
-      // WS → TCP (sempre com newline)
+  // forwards messages from WS to TCP (always appends a newline)
       ws.on('message', (raw: any) => {
         const s = Buffer.isBuffer(raw) ? raw.toString() : String(raw);
         const out = s.endsWith('\n') ? s : s + '\n';
         try { tcp.write(out); } catch {}
       });
 
-      // TCP → WS
+  // forwards data from TCP to WS
       tcp.on('data', (data) => {
         if (ws.readyState === ws.OPEN) {
           try { ws.send(data.toString()); } catch {}

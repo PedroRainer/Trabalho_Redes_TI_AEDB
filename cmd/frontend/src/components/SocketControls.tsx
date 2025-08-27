@@ -14,7 +14,7 @@ export default function SocketControls() {
     const text = message.trim();
     if (!text) return;
 
-    // impede abrir outra conexão enquanto há uma em aberto
+  // prevents opening another connection while one is already open
     if (wsRef.current && wsRef.current.readyState !== WebSocket.CLOSED) {
       addLog('⚠️ Já existe uma conexão aberta. Feche antes de enviar novamente.');
       return;
@@ -22,13 +22,13 @@ export default function SocketControls() {
 
     setSending(true);
     try {
-      // inicializa o bridge no Next (instala o listener de upgrade)
+  // initializes the Next.js bridge by installing the upgrade listener
       await fetch('/api/tcp', { method: 'GET' }).catch(() => {});
 
       const proto = location.protocol === 'https:' ? 'wss' : 'ws';
       const url = `${proto}://${location.host}/api/tcp`;
 
-      // 👉 loga que vai conectar
+  // logs that a connection attempt will be made
       addLog(`🔌 Conectando WebSocket… (${url})`);
 
       const ws = new WebSocket(url);
@@ -44,10 +44,10 @@ export default function SocketControls() {
       };
 
       ws.onopen = () => {
-        // 👉 loga que conectou
+  // logs that the connection was established
         addLog('✅ Conexão iniciada');
 
-        // envia com newline (Scanner do Go lê por linha)
+  // sends the message with a newline (the Go scanner reads by line)
         ws.send(text.endsWith('\n') ? text : text + '\n');
         addLog('📤 ' + text);
         setMessage('');
@@ -55,7 +55,7 @@ export default function SocketControls() {
 
       ws.onmessage = (e) => {
         addLog('📩 ' + e.data);
-        // fecha automaticamente após a primeira resposta
+  // automatically closes after the first response
         safeClose(1000, 'done');
       };
 
@@ -66,7 +66,7 @@ export default function SocketControls() {
 
       ws.onclose = () => {
         if (!closed) {
-          // fechado pelo servidor/usuário sem passar pelo safeClose
+          // closed by the server/user without going through safeClose
           wsRef.current = null;
           setSending(false);
         }
@@ -97,7 +97,7 @@ export default function SocketControls() {
   };
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // Enter envia; Shift+Enter quebra linha
+    // Enter sends; Shift+Enter inserts a newline
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       if (!sending) sendOnce();

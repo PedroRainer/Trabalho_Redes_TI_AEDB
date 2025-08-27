@@ -5,12 +5,12 @@ html, body, #__next { height: 100%; }
 body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
 
 body {
-  /* Gradient from red to black over the page background image */
+  /* Applies a red-to-black gradient overlay above the page background image */
   color: #ffffff;
   margin: 0;
   padding: 24px;
 
-  /* Layered background: gradient on top of image */
+  /* Sets a layered background: gradient overlay followed by the page image */
   background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.952), rgba(233, 9, 9, 0.9)),
                     url("/Arrascaeta-Flamengo-aspect-ratio-512-320.webp");
   background-repeat: no-repeat;
@@ -22,7 +22,7 @@ body {
 }
 
 .container {
-  /* Keep content centered and constrained */
+  /* Keeps the main content centered and constrained to a maximum width */
   width: auto;
   max-width: 1200px;
   margin-left: auto;

@@ -43,12 +43,13 @@ func handleConnection(conn net.Conn) {
 		case "TIME", "TIME?":
 			fmt.Fprintf(writer, "TIME %s\n", time.Now().Format(time.RFC3339))
 		default:
-			fmt.Fprintln(writer, msg) // eco puro
+			fmt.Fprintln(writer, msg)
 		}
 		writer.Flush()
 	}
 }
 
+// tcp connection
 func main() {
 	addr := ":1234"
 	ln, err := net.Listen("tcp", addr)
